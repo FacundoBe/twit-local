@@ -145,16 +145,17 @@ def edit_image(request):
     if request.user.is_authenticated:
         profile = Profile.objects.get(user_id=request.user.id) # profile del usuario loggeado        
         
-        form = AvatarForm()
+        formAvatar = AvatarForm()
        
         if request.method == "POST":
-            form = AvatarForm(request.POST, request.FILES) #Ojo los archivos viajan separados en request.FILES
-            if form.is_valid():
+            formAvatar = AvatarForm(request.POST, request.FILES) #Ojo los archivos viajan separados en request.FILES
+            if formAvatar.is_valid():
                 try: # Replace the image in avatar model if it already exists 
                     profile.avatar # There is no avatar object yet, then we create a new one
                     avatar=profile.avatar
-                    avatar.uploaded_image= form.cleaned_data.get("uploaded_image")   
+                    avatar.uploaded_image= formAvatar.cleaned_data.get("uploaded_image")   
                     avatar.save()
+                    messages.success(request,(' entro como formulario valido '))
                     return redirect(reverse('profile', args=[profile.user.id]))
                 except ObjectDoesNotExist: # Ther isnt an avatar object related to this profile so we create it
                     avatar=form.save(commit=False) #commit=false para crear la instancia del Meep desde MeepForm pero
@@ -173,10 +174,10 @@ def edit_image(request):
                     pass # if it doesnt exist theres notihing o delete 
                 profile.save()
                 
-                return redirect(reverse('profile', args=[profile.user.id]))
+                #return redirect(reverse('profile', args=[profile.user.id]))
                 
 
-        return render(request, 'edit_image.html', {'form':form})
+        return render(request, 'edit_image.html', {'formAvatar':formAvatar})
         
     else:
         messages.success(request,(' You are Not Logged In !!   '))
