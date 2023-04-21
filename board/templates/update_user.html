@@ -1,0 +1,18 @@
+
+{% extends 'base.html' %}
+{% load static%}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<div class="col-md-6 offset-md-3">
+    <h1 >Update User </h1>
+    <form class='signup-form' , METHOD="POST" action="">
+        {% csrf_token %}
+        {{form.as_p}}
+        <br>
+        <button type="submit" class="btn btn-secondary">Confirm</button> 
+        <a type="submit" href="{% url 'profile' request.user.id %}" class="btn btn-outline-danger">Cancel</a> 
+    </form>
+</div>
+{% endblock %}

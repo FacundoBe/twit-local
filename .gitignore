@@ -1,0 +1,16 @@
+__pycache__/
+
+*.pyc
+**/.pyc
+**/**/.pyc
+
+# Text backup files
+*.bak
+
+# Database
+*.sqlite3
+
+.env
+
+/staticfiles
+

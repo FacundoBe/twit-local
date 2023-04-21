@@ -1,0 +1,12 @@
+.img-portrait-main {
+    height: 250px;
+}
+
+.picture-frame {
+   margin: 20px;
+}
+
+.picture-frame img {
+border-radius: 50%;
+margin: 20px;
+}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static%}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/edit_image.css' %}">
+<div class="container text-center">
+    <h1>Select From Presets </h1>
+    <!-- The grid: four columns -->
+    
+    <div class="row">
+
+        <h1>{{data}}</h1>
+    
+        {% for i in '12345678'|make_list %}
+        <div class="column">
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden"  name="image_number" value="{{i}}">
+                <input type="image" src="{% static 'images/default'|add:i|add:'.jpg' %}" alt="Batman">
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    
+
+    <div class="custom_image">
+        <h1>Upload Your Image </h1>
+        <form method='POST' enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-secondary">Upload File</button>
+        </form>
+    </div>
+
+</div>
+
+
+{% endblock %}

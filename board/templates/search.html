@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+
+{% if searched %}
+<div class="col-8">
+    <h1> <span class="text-muted"> Searched for: </span> {{searched}} </h1>
+        {% if not meeps%}
+        <h2 class="text-muted">No Results Found </h2>
+        {% endif %}
+        {%for meep in meeps %}
+        <div class="alert alert-dark" role="alert">
+            {{ meep.body }}<br>
+            <small class="text-muted">({{ meep.created_at }}) By
+            <a href="{% url 'profile' meep.user.id  %}">@{{ meep.user.username }}</a> </small>
+        </div>
+        {% endfor%}
+</div>
+
+{% else%}
+    <h1> Type Your Search in the Search Bar Please </h1>
+{% endif %}
+
+
+{% endblock %}
