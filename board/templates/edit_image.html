@@ -26,10 +26,12 @@
 
     <div class="custom_image">
         <h1>Upload Your Image </h1>
-        <form method='POST' enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data">
+            <input type="hidden"  name="imagen_de_usuario" value="True">
             {% csrf_token %}
             {{ formAvatar.as_p }}
             <button type="submit" class="btn btn-secondary">Upload File</button>
+            <a type="submit" href="{% url 'profile' request.user.id %}" class="btn btn-danger">Cancel</a> 
         </form>
     </div>
 

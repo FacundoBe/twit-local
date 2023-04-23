@@ -148,25 +148,26 @@ def edit_image(request):
         formAvatar = AvatarForm()
        
         if request.method == "POST":
-            formAvatar = AvatarForm(request.POST, request.FILES) #Ojo los archivos viajan separados en request.FILES
-            if formAvatar.is_valid():
-                try: # Replace the image in avatar model if it already exists 
-                    profile.avatar # There is no avatar object yet, then we create a new one
-                    avatar=profile.avatar
-                    avatar.uploaded_image= formAvatar.cleaned_data.get("uploaded_image")   
-                    avatar.save()
-                    messages.success(request,(' entro como formulario valido '))
-                    return redirect(reverse('profile', args=[profile.user.id]))
-                except ObjectDoesNotExist: # Ther isnt an avatar object related to this profile so we create it
-                    avatar=form.save(commit=False) #commit=false para crear la instancia del Meep desde MeepForm pero
-                    avatar.profile=profile         # que no la guarde todavia por que recien ahora incrporo el profile
-                    avatar.save()                  #Ahora que ya esta definido el user si guardo      
-                    messages.success(request,(' Image Updated'))
-                    return redirect(reverse('profile', args=[profile.user.id]))
-                    
+            if  "imagen_de_usuario" in request.POST: # si esto existe significa que se activo el boton de subir imagen de usuario
+                formAvatar = AvatarForm(request.POST, request.FILES) #Ojo los archivos viajan separados en request.FILES
+                if formAvatar.is_valid():
+                    try: # Replace the image in avatar model if it already exists 
+                        profile.avatar # There is no avatar object yet, then we create a new one
+                        avatar=profile.avatar
+                        avatar.uploaded_image= formAvatar.cleaned_data.get("uploaded_image")   
+                        avatar.save()
+                        messages.success(request,(' entro como formulario valido '))
+                        return redirect(reverse('profile', args=[profile.user.id]))
+                    except ObjectDoesNotExist: # Ther isnt an avatar object related to this profile so we create it
+                        avatar=formAvatar.save(commit=False) #commit=false para crear la instancia del Meep desde MeepForm pero
+                        avatar.profile=profile         # que no la guarde todavia por que recien ahora incrporo el profile
+                        avatar.save()                  #Ahora que ya esta definido el user si guardo      
+                        messages.success(request,(' Image Updated'))
+                        return redirect(reverse('profile', args=[profile.user.id]))
+                        
             # estoy en post pero no por el formulario si no por las imagenes preseteadas
-            if request.POST['image_number']: #en caso que se haya activado el formulario de alguna imagen
-                image_number=request.POST['image_number']
+            if 'image_number' in request.POST:            #en caso que se haya activado el formulario de alguna imagen predeterminada 
+                image_number=request.POST['image_number'] #el diccionario de request.POST vuelve con un valor de image_number
                 profile.preset_image = f"default{image_number}.jpg" 
                 try:
                     profile.avatar.delete()  # Selecting a preset image deletes existing uploaded image
@@ -174,7 +175,7 @@ def edit_image(request):
                     pass # if it doesnt exist theres notihing o delete 
                 profile.save()
                 
-                #return redirect(reverse('profile', args=[profile.user.id]))
+                return redirect(reverse('profile', args=[profile.user.id]))
                 
 
         return render(request, 'edit_image.html', {'formAvatar':formAvatar})

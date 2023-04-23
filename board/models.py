@@ -47,7 +47,7 @@ post_save.connect(create_profile, sender=User)    #this can be done also with re
 class Avatar(models.Model):
     profile=models.OneToOneField(Profile, on_delete = models.CASCADE )
     # pprod uploaded_image=CloudinaryField('image',folder='avatar', transformation={'height':250, 'width':250, 'crop':"lfill"})
-    uploaded_image=models.ImageField(null=True, blank=True, upload_to="images/")
+    uploaded_image=models.ImageField( upload_to="images/")
 
 # This signal deletes de img from cloudinary when the image is removed form the database
 # pprod @receiver(pre_delete, sender=Avatar)          # using decorator
