@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Profile, Meep
 from .forms import MeepForm, SignUpForm, AvatarForm
@@ -152,13 +152,12 @@ def edit_image(request):
                 formAvatar = AvatarForm(request.POST, request.FILES) #Ojo los archivos viajan separados en request.FILES
                 if formAvatar.is_valid():
                     try: # Replace the image in avatar model if it already exists 
-                        profile.avatar # There is no avatar object yet, then we create a new one
-                        avatar=profile.avatar
+                        avatar=profile.avatar  # If there isn't an avatar object this line raises an exeption ObjectDoesNotExist
                         avatar.uploaded_image= formAvatar.cleaned_data.get("uploaded_image")   
                         avatar.save()
                         messages.success(request,(' entro como formulario valido '))
                         return redirect(reverse('profile', args=[profile.user.id]))
-                    except ObjectDoesNotExist: # Ther isnt an avatar object related to this profile so we create it
+                    except ObjectDoesNotExist: # There isnt an avatar object related to this profile so we create it
                         avatar=formAvatar.save(commit=False) #commit=false para crear la instancia del Meep desde MeepForm pero
                         avatar.profile=profile         # que no la guarde todavia por que recien ahora incrporo el profile
                         avatar.save()                  #Ahora que ya esta definido el user si guardo      
@@ -184,3 +183,18 @@ def edit_image(request):
         messages.success(request,(' You are Not Logged In !!   '))
         return redirect('home') 
     
+
+def meep_like(request,pk):
+    if request.user.is_authenticated:
+        meep = get_object_or_404(Meep, id=pk)
+        if meep.likes.filter(id = request.user.id): # If the active user clicks an already liked meep he is disliking it
+            meep.likes.remove(request.user)
+        else:
+            meep.likes.add(request.user)
+    
+        return redirect('home')         
+
+    else:
+        messages.success(request,(' You are Not Logged In !!   '))
+        return redirect('home')         
+        

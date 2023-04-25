@@ -11,4 +11,5 @@ urlpatterns = [
     path('search/',views.search , name="search"),
     path('update_user/',views.update_user , name="update_user"),
     path('edit_image',views.edit_image , name="edit_image"),
+    path('meep_like/<int:pk>',views.meep_like , name="meep_like"),
 ]

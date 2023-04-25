@@ -7,26 +7,41 @@
 <div class="container text-center">
     <div class="row">
         <div class="col-8">
-        
-            <h1>{{ profile.user.username}} Profile  </h1>
+
+            <h1>{{ profile.user.username}} Profile </h1>
             <div class="picture-frame">
                 {% if profile.avatar.uploaded_image %}
                 <img src="{{ profile.avatar.uploaded_image.url }}" class="img-portrait-main" alt="Profile Image">
                 {%else%}
-                <img src="{% static 'images/'|add:profile.preset_image %}" class="img-portrait-main" alt="Profile Image">
+                <img src="{% static 'images/'|add:profile.preset_image %}" class="img-portrait-main"
+                    alt="Profile Image">
                 {% endif %}
-           
-            {% if request.user.id == profile.user.id %}
-            <br>
-            <a href="{% url 'edit_image' %}" class="btn btn-outline-secondary" > Change Image  </a>
-            {% endif %}
+
+                {% if request.user.id == profile.user.id %}
+                <br>
+                <a href="{% url 'edit_image' %}" class="btn btn-outline-secondary"> Change Image </a>
+                {% endif %}
             </div>
             {% if meeps %}
             {%for meep in meeps %}
             <div class="alert alert-dark" role="alert">
-                {{ meep.body }}<br>
-                <small class="text-muted">({{ meep.created_at }}) By
-                    @{{ meep.user.username }}</small>
+                <div class="row">
+                    <div class="col-1">
+                        {% if profile.avatar.uploaded_image %}
+                        <img src="{{ profile.avatar.uploaded_image.url }}" class="rounded-circle" 
+                            alt="Profile Image in msg" width="50" height="50" >
+                        {%else%}
+                        <img src="{% static 'images/'|add:profile.preset_image %}" class="rounded-circle"  
+                        alt="Profile Image in msg" width="50" height="50">
+                        {% endif %}
+                    </div>
+
+                    <div class="col-10">
+                        {{ meep.body }}<br>
+                        <small class="text-muted">({{ meep.created_at }}) By
+                            @{{ meep.user.username }}</small>
+                    </div>
+                </div>
             </div>
             {% endfor%}
             {% endif %}
@@ -75,7 +90,8 @@
 
             </div>
             <br />
-            {% if request.user.id != profile.user.id%} <!-- En mi propio perfil no cecesito el boton de Unfollow, solo lo muestra si estoy viendo perfil ajeno -->
+            {% if request.user.id != profile.user.id%}
+            <!-- En mi propio perfil no cecesito el boton de Unfollow, solo lo muestra si estoy viendo perfil ajeno -->
             <form method="POST">
                 {% csrf_token %}
                 {% if profile in user.profile.follows.all %}
@@ -85,7 +101,7 @@
                 <button class="btn btn-outline-success" name="follow" value="follow" type="submit">Follow
                     {{profile.user.username|lower}} </button>
                 {% endif %}
-            {% endif %}
+                {% endif %}
             </form>
             <br />
             {% if request.user.id == profile.user.id%}
