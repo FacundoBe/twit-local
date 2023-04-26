@@ -23,27 +23,9 @@
                 {% endif %}
             </div>
             {% if meeps %}
-            {%for meep in meeps %}
-            <div class="alert alert-dark" role="alert">
-                <div class="row">
-                    <div class="col-1">
-                        {% if profile.avatar.uploaded_image %}
-                        <img src="{{ profile.avatar.uploaded_image.url }}" class="rounded-circle" 
-                            alt="Profile Image in msg" width="50" height="50" >
-                        {%else%}
-                        <img src="{% static 'images/'|add:profile.preset_image %}" class="rounded-circle"  
-                        alt="Profile Image in msg" width="50" height="50">
-                        {% endif %}
-                    </div>
-
-                    <div class="col-10">
-                        {{ meep.body }}<br>
-                        <small class="text-muted">({{ meep.created_at }}) By
-                            @{{ meep.user.username }}</small>
-                    </div>
-                </div>
-            </div>
-            {% endfor%}
+                {%for meep in meeps %}
+                    {% include 'partials/meepcards.html' %}
+                {% endfor%}
             {% endif %}
         </div>
         <div class="col-4">

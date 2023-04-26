@@ -192,9 +192,10 @@ def meep_like(request,pk):
         else:
             meep.likes.add(request.user)
     
-        return redirect('home')         
+        return redirect(request.META.get("HTTP_REFERER")) 
+        
 
     else:
         messages.success(request,(' You are Not Logged In !!   '))
-        return redirect('home')         
+        return redirect('home')                 
         
