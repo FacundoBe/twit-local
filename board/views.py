@@ -6,6 +6,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponseBadRequest, JsonResponse
+import json
 
 # Create your views here.
 
@@ -13,7 +15,21 @@ def home(request):
     if request.user.is_authenticated:
         form = MeepForm(request.POST or None)
         
-        if request.method == "POST":
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'  # AJAX REQUEST FROM 
+        if request.method == "POST" and is_ajax:                               # LIKE click request to post new meep
+            data = json.load(request)
+            meepId=data.get('meepNumber')
+            meep = get_object_or_404(Meep, id=meepId)
+            if meep.likes.filter(id = request.user.id): # If the active user clicks an already liked meep he is disliking it
+                meep.likes.remove(request.user)
+                return JsonResponse({'status': 'Unlike','count':meep.number_of_likes()})
+            else:
+                meep.likes.add(request.user)
+                return JsonResponse({'status': 'Like','count':meep.number_of_likes()})
+    
+
+        
+        if request.method == "POST" and not is_ajax: # POST request to post new meep
             if form.is_valid():
                 meep = form.save(commit=False) #commit=false para crear la instancia del Meep desde MeepForm pero
                                               # que no la guarde todavia por que falta definir el user
@@ -23,9 +39,13 @@ def home(request):
                 return redirect ('home')
             else: #if form is not valid 
                 messages.success(request,(' There was an error in your submission'))
+        
+        
+                    
 
         meeps = Meep.objects.all().order_by("-created_at")
         return render(request, 'home.html', {"meeps" : meeps,"form":form })
+
     else:
         meeps = Meep.objects.all().order_by("-created_at")
         return render(request, 'home.html', {"meeps" : meeps})
