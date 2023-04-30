@@ -23,7 +23,10 @@
             {% endif %}
         </div>
     </div>
-
+    
+    {% if user.is_authenticated %} {# si el usuario no esta loggeado no puede hacer likes #}
     <script src="{% static 'js/likesAjax.js' %}"></script>
+    {% endif %}
+
 {% endblock %}
 

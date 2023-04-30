@@ -15,7 +15,7 @@ def home(request):
     if request.user.is_authenticated:
         form = MeepForm(request.POST or None)
         
-        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'  # AJAX REQUEST FROM 
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'  # AJAX REQUEST from 
         if request.method == "POST" and is_ajax:                               # LIKE click request to post new meep
             data = json.load(request)
             meepId=data.get('meepNumber')
@@ -27,7 +27,6 @@ def home(request):
                 meep.likes.add(request.user)
                 return JsonResponse({'status': 'Like','count':meep.number_of_likes()})
     
-
         
         if request.method == "POST" and not is_ajax: # POST request to post new meep
             if form.is_valid():
@@ -40,13 +39,12 @@ def home(request):
             else: #if form is not valid 
                 messages.success(request,(' There was an error in your submission'))
         
-        
-                    
-
+                           
         meeps = Meep.objects.all().order_by("-created_at")
         return render(request, 'home.html', {"meeps" : meeps,"form":form })
 
     else:
+        
         meeps = Meep.objects.all().order_by("-created_at")
         return render(request, 'home.html', {"meeps" : meeps})
 
@@ -59,12 +57,25 @@ def profile_list(request):
         messages.success(request,(' You must be Logged to View this Page'))
         return redirect('home')
 
+
 def profile(request, pk):
     if request.user.is_authenticated:        
         profile = Profile.objects.get(user_id=pk) # profile que estoy viendo actualmente
         meeps=Meep.objects.filter(user_id=pk).order_by("-created_at")
+        
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'  # AJAX REQUEST FROM 
+        if request.method == "POST" and is_ajax:                               # LIKE click request to post new meep
+            data = json.load(request)
+            meepId=data.get('meepNumber')
+            meep = get_object_or_404(Meep, id=meepId)
+            if meep.likes.filter(id = request.user.id): # If the active user clicks an already liked meep he is disliking it
+                meep.likes.remove(request.user)
+                return JsonResponse({'status': 'Unlike','count':meep.number_of_likes()})
+            else:
+                meep.likes.add(request.user)
+                return JsonResponse({'status': 'Like','count':meep.number_of_likes()})
         # POST form logic
-        if request.method == "POST":
+        if request.method == "POST" and not is_ajax:
             # Get current user profile (que usuario esta loggeado)
             current_user_profile = request.user.profile
             # Get form data
@@ -103,6 +114,7 @@ def login_user(request):
 
     else:
         return render(request, 'login.html', {})
+
 
 def logout_user(request):
     logout(request)
@@ -166,7 +178,7 @@ def edit_image(request):
         profile = Profile.objects.get(user_id=request.user.id) # profile del usuario loggeado        
         
         formAvatar = AvatarForm()
-       
+
         if request.method == "POST":
             if  "imagen_de_usuario" in request.POST: # si esto existe significa que se activo el boton de subir imagen de usuario
                 formAvatar = AvatarForm(request.POST, request.FILES) #Ojo los archivos viajan separados en request.FILES
@@ -196,7 +208,6 @@ def edit_image(request):
                 
                 return redirect(reverse('profile', args=[profile.user.id]))
                 
-
         return render(request, 'edit_image.html', {'formAvatar':formAvatar})
         
     else:
@@ -204,18 +215,5 @@ def edit_image(request):
         return redirect('home') 
     
 
-def meep_like(request,pk):
-    if request.user.is_authenticated:
-        meep = get_object_or_404(Meep, id=pk)
-        if meep.likes.filter(id = request.user.id): # If the active user clicks an already liked meep he is disliking it
-            meep.likes.remove(request.user)
-        else:
-            meep.likes.add(request.user)
-    
-        return redirect(request.META.get("HTTP_REFERER")) 
-        
-
-    else:
-        messages.success(request,(' You are Not Logged In !!   '))
-        return redirect('home')                 
+ 
         

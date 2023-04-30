@@ -2,6 +2,42 @@
 
 var elements = document.getElementsByClassName("like-icon");
 
+var toogleLike = function () {
+    var meepNumber = this.getAttribute("id");
+    fetch(window.location.href, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+            "X-Requested-With": "XMLHttpRequest",
+            "X-CSRFToken": getCookie("csrftoken"),
+        },
+        body: JSON.stringify({ 'meepNumber': meepNumber })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data['status'] === 'Like') {
+                this.setAttribute("fill", "#58A3EA");
+                this.setAttribute("stroke","#58A3EA");
+                document.getElementById('likes/' + this.getAttribute('id'))
+                .innerHTML=data['count']; //busco el contador que corresponde a este meep
+                console.log(data['count'])
+            } else {                                                 // el name del svg es = al id del meep que active 
+                this.setAttribute("fill", "none");
+                this.setAttribute("stroke","#707B7C");
+                document.getElementById('likes/' + this.getAttribute('id'))
+                .innerHTML=data['count']; //busco el contador que corresponde a este meep
+                console.log(data['count'])
+            }
+        });
+};
+
+for (element of elements) {
+    element.addEventListener("click", toogleLike);
+    element.setAttribute("cursor","pointer")
+}
+
+
+
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== "") {
@@ -16,36 +52,4 @@ function getCookie(name) {
         }
     }
     return cookieValue;
-}
-
-var toogleLike = function () {
-    var meepNumber = this.getAttribute("name");
-    fetch(window.location.href, {
-        method: "POST",
-        credentials: "same-origin",
-        headers: {
-            "X-Requested-With": "XMLHttpRequest",
-            "X-CSRFToken": getCookie("csrftoken"),
-        },
-        body: JSON.stringify({ 'meepNumber': meepNumber })
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data['status'] === 'Like') {
-                this.setAttribute("fill", "#58A3EA");
-                document.getElementById('likes/' + this.getAttribute('name'))
-                .innerHTML=data['count']; //busco el contador que corresponde a este meep
-                console.log(data['count'])
-            } else {                                                 // el name del svg es = al id del meep que active 
-                this.setAttribute("fill", "none");
-                document.getElementById('likes/' + this.getAttribute('name'))
-                .innerHTML=data['count']; //busco el contador que corresponde a este meep
-                console.log(data['count'])
-            }
-        });
-};
-
-for (var i = 0; i < elements.length; i++) {
-    elements[i].addEventListener('click', toogleLike, false);
-
 }
